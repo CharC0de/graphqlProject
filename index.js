@@ -7,7 +7,6 @@ import ReviewSchema from "./schema/mongoSchema/review.js";
 import AuthorSchema from "./schema/mongoSchema/author.js";
 import UserSchema from "./schema/mongoSchema/user.js";
 import { isValidObjectId } from "mongoose";
-import author from "./schema/mongoSchema/author.js";
 
 const resolvers = {
   Query: {
@@ -24,6 +23,10 @@ const resolvers = {
   Mutation: {
     addGame: async (_, args) => {
       const result = await GameSchema.create(args.game);
+      return result;
+    },
+    addAuthor: async (_, args) => {
+      const result = await AuthorSchema.create(args.author);
       return result;
     },
     addReview: async (_, args) => {
@@ -88,11 +91,11 @@ const resolvers = {
   },
   Author: {
     reviews: async (parent) =>
-      await ReviewSchema.findById({ author_id: parent._id }),
+      await ReviewSchema.find({ author_id: Object(parent._id) }),
   },
   Review: {
     author: async (parent) => await AuthorSchema.findById(parent.author_id),
-    game: async (parent) => await GameSchema.findById(parent.id),
+    game: async (parent) => await GameSchema.findById(parent.game_id),
   },
 };
 const server = new ApolloServer({
@@ -112,4 +115,4 @@ const { url } = await startStandaloneServer(server, {
   },
 });
 
-console.log("server ready at", 4000);
+console.log("server ready at", 4000, url);
